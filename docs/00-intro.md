@@ -28,7 +28,7 @@ By working with a single, coherent application across all five days, you will se
 
 ```
 .
-├── 00-README.md          ← This file — overview, prerequisites, lab setup
+├── 00-intro.md          ← This file — overview, prerequisites, lab setup
 ├── 01-day1.md            ← Observability & Prometheus Fundamentals
 ├── 02-day2.md            ← Advanced PromQL & Microservice Instrumentation
 ├── 03-day3.md            ← Alerting & Alertmanager
