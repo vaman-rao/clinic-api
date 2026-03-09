@@ -26,7 +26,7 @@ services:
     container_name: clinic-api
 
     ports:
-      - "9090:9090"
+      - "9999:9999"
 
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/clinic_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
