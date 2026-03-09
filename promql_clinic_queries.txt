@@ -1,0 +1,134 @@
+PROMQL QUERIES FOR SPRING BOOT CLINIC SERVICE
+
+Section 1 — General Application Monitoring Queries
+
+1.  Question: How many HTTP requests has the clinic API received?
+    PromQL: http_server_requests_seconds_count
+
+2.  Question: How many API requests per second are hitting the clinic
+    service? PromQL: rate(http_server_requests_seconds_count[1m])
+
+3.  Question: How many GET, POST, PUT and DELETE requests are being
+    received? PromQL: sum by (method) (
+    rate(http_server_requests_seconds_count[1m]) )
+
+4.  Question: Which clinic API endpoints are receiving the most traffic?
+    PromQL: sum by (uri) ( rate(http_server_requests_seconds_count[1m])
+    )
+
+5.  Question: How many HTTP errors (4xx and 5xx) are happening in the
+    clinic service? PromQL: sum(
+    rate(http_server_requests_seconds_count{status=~“4..|5..”}[1m]) )
+
+6.  Question: What percentage of clinic API requests are failing?
+    PromQL: (
+    sum(rate(http_server_requests_seconds_count{status=~“5..”}[1m])) /
+    sum(rate(http_server_requests_seconds_count[1m])) ) * 100
+
+7.  Question: What is the average response time of the clinic API?
+    PromQL: rate(http_server_requests_seconds_sum[1m]) /
+    rate(http_server_requests_seconds_count[1m])
+
+8.  Question: Which clinic API endpoints are the slowest? PromQL: ( sum
+    by (uri) (rate(http_server_requests_seconds_sum[1m])) / sum by (uri)
+    (rate(http_server_requests_seconds_count[1m])) )
+
+9.  Question: How much JVM memory is currently used by the clinic
+    service? PromQL: jvm_memory_used_bytes
+
+10. Question: How much heap memory is used by the clinic application?
+    PromQL: jvm_memory_used_bytes{area=“heap”}
+
+11. Question: How much CPU is the clinic service consuming? PromQL:
+    process_cpu_usage
+
+12. Question: How many threads are currently running in the clinic
+    application? PromQL: jvm_threads_live_threads
+
+13. Question: How many database connections are currently active?
+    PromQL: hikaricp_connections_active
+
+14. Question: What is the maximum configured database connection pool
+    size? PromQL: hikaricp_connections_max
+
+15. Question: Which endpoints receive the highest traffic in the clinic
+    service? PromQL: topk(5, sum by (uri) (
+    rate(http_server_requests_seconds_count[5m]) ) )
+
+Section 2 — Clinic Domain Specific Queries
+
+16. Question: How many requests are made to the Doctor APIs? PromQL:
+    sum(rate(http_server_requests_seconds_count{uri=~“/doctors.*“}[1m]))
+
+17. Question: How many requests are made to the Patient APIs? PromQL:
+    sum(rate(http_server_requests_seconds_count{uri=~“/patients.*“}[1m]))
+
+18. Question: How many appointment API requests are being made per
+    second? PromQL:
+    sum(rate(http_server_requests_seconds_count{uri=~“/appointments.*“}[1m]))
+
+19. Question: What is the average response time for Doctor APIs? PromQL:
+    sum(rate(http_server_requests_seconds_sum{uri=~“/doctors.”}[1m])) /
+    sum(rate(http_server_requests_seconds_count{uri=~”/doctors.”}[1m]))
+
+20. Question: What is the average response time for Patient APIs?
+    PromQL:
+    sum(rate(http_server_requests_seconds_sum{uri=~“/patients.”}[1m])) /
+    sum(rate(http_server_requests_seconds_count{uri=~”/patients.”}[1m]))
+
+21. Question: What is the average response time for Appointment APIs?
+    PromQL:
+    sum(rate(http_server_requests_seconds_sum{uri=~“/appointments.”}[1m]))
+    /
+    sum(rate(http_server_requests_seconds_count{uri=~”/appointments.”}[1m]))
+
+22. Question: Which Doctor API endpoint is slowest? PromQL: topk(5, (
+    sum by
+    (uri)(rate(http_server_requests_seconds_sum{uri=~“/doctors.”}[1m]))
+    / sum by
+    (uri)(rate(http_server_requests_seconds_count{uri=~”/doctors.”}[1m]))
+    ) )
+
+23. Question: Which Patient API endpoint receives the most traffic?
+    PromQL: topk(5, sum by
+    (uri)(rate(http_server_requests_seconds_count{uri=~“/patients.*“}[5m]))
+    )
+
+24. Question: Which Appointment endpoints are the slowest? PromQL:
+    topk(5, ( sum by
+    (uri)(rate(http_server_requests_seconds_sum{uri=~“/appointments.”}[1m]))
+    / sum by
+    (uri)(rate(http_server_requests_seconds_count{uri=~”/appointments.”}[1m]))
+    ) )
+
+25. Question: How many appointment requests are failing? PromQL:
+    sum(rate(http_server_requests_seconds_count{uri=~“/appointments.*“,status=~”4..|5..”}[1m]))
+
+26. Question: What percentage of Doctor API requests are failing?
+    PromQL: (
+    sum(rate(http_server_requests_seconds_count{uri=~“/doctors.”,status=~”5..”}[1m]))
+    /
+    sum(rate(http_server_requests_seconds_count{uri=~”/doctors.”}[1m]))
+    ) * 100
+
+27. Question: What percentage of Patient API requests are failing?
+    PromQL: (
+    sum(rate(http_server_requests_seconds_count{uri=~“/patients.”,status=~”5..”}[1m]))
+    /
+    sum(rate(http_server_requests_seconds_count{uri=~”/patients.”}[1m]))
+    ) * 100
+
+28. Question: Which Doctor endpoint receives the most traffic? PromQL:
+    topk(3, sum by
+    (uri)(rate(http_server_requests_seconds_count{uri=~“/doctors.*“}[5m]))
+    )
+
+29. Question: Which Patient endpoint receives the most traffic? PromQL:
+    topk(3, sum by
+    (uri)(rate(http_server_requests_seconds_count{uri=~“/patients.*“}[5m]))
+    )
+
+30. Question: Which Appointment endpoint receives the most traffic?
+    PromQL: topk(3, sum by
+    (uri)(rate(http_server_requests_seconds_count{uri=~“/appointments.*“}[5m]))
+    )
